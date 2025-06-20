@@ -10,7 +10,7 @@ export default function Home() {
         </h2>
         <p className="text-lg text-purple-100 max-w-2xl mx-auto mb-12 leading-relaxed">
           A platform for interactive art, custom scripts, and digital creativity. 
-          Coming soon: TouchDesigner photobooths, generative art, and more.
+          Coming soon: TouchDesigner photobooths, generative art, and more. yuh yuhhh
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button className="bg-white text-purple-900 px-8 py-3 rounded-full font-semibold hover:bg-purple-50 transition-colors">
