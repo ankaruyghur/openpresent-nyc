@@ -5,13 +5,8 @@ vi.mock('@aws-sdk/s3-request-presigner', () => ({
     getSignedUrl: vi.fn()
 }))
 
-// Mock crypto.randomUUID
-vi.mock('crypto', () => ({
-    randomUUID: vi.fn(() => 'mock-uuid-123')
-}))
-
 import { mockClient } from 'aws-sdk-client-mock'
-import { S3Client, HeadBucketCommand, PutObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { NextRequest } from 'next/server'
 import { POST } from './route'
@@ -50,7 +45,8 @@ describe('/api/photobooth/presign', () => {
         // Set up env var for tests
         process.env.AWS_REGION = 'us-east-1';
         process.env.AWS_S3_BUCKET_NAME = 'test-bucket';
-        process.env.PHOTOBOOTH_TOKENS = 'valid_token, another_valid_token';
+        process.env.PHOTOBOOTH_TOKENS = 'valid_token,another_valid_token';
+        process.env.PHOTO_ENCODE_KEY = 'test-secret-key-123';
     })
 
     it('should return presigned URL with valid token', async () => {
@@ -79,7 +75,7 @@ describe('/api/photobooth/presign', () => {
             expect.any(Object), // S3Client
             expect.objectContaining({
                 input: expect.objectContaining({
-                    Key: expect.stringMatching(/^photobooth\/op_test\/test_event\/\d{4}-\d{2}-\d{2}\/mock-uuid-123\.jpg$/)
+                    Key: expect.stringMatching(/^photobooth\/op_test\/test_event\/\d{4}-\d{2}-\d{2}\/\d{14}\.jpg$/)
                 })
             }),
             expect.any(Object) // options
@@ -169,7 +165,7 @@ describe('/api/photobooth/presign', () => {
             expect.any(Object), // S3Client
             expect.objectContaining({
                 input: expect.objectContaining({
-                    Key: expect.stringMatching(/^photobooth\/OpenPresentTest\/OpenPresentTest-session\/\d{4}-\d{2}-\d{2}\/mock-uuid-123\.jpg$/)
+                    Key: expect.stringMatching(/^photobooth\/OpenPresentTest\/OpenPresentTest-session\/\d{4}-\d{2}-\d{2}\/\d{14}\.jpg$/)
                 })
             }),
             expect.any(Object) // options

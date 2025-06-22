@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { S3Client, PutObjectCommand, HeadBucketCommand } from '@aws-sdk/client-s3'
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { randomUUID } from 'crypto';
+import { S3Client, PutObjectCommand, HeadBucketCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { encodePhotoId } from '@/lib/photo-id';
 
 const s3Client = new S3Client({
     credentials: {
@@ -49,14 +49,21 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Generate unique photo ID
-        const photoId = randomUUID();
-        const timestamp = new Date().toISOString().split('T')[0]; // YYY-MM-DD
+        // Sanitize brand and session values
         const brandDir = (metadata.brand || '').trim() || 'OpenPresentTest';
         const session = (metadata.session || '').trim() || `${brandDir}-session`;
         const sanitizedBrand = brandDir.replace(/[^\w-]/g, '_');
         const sanitizedSession = session.replace(/[^\w-]/g, '_');
-        const s3Key = `photobooth/${sanitizedBrand}/${sanitizedSession}/${timestamp}/${photoId}.jpg`;
+
+        // Generate folder name and filename using date and time
+        const timestampDir = new Date().toISOString().split('T')[0]; // YYY-MM-DD
+        const filename = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14); // YYYYMMDDHHMMSS
+
+        // Generate encoded photo ID (includes timestamp)
+        const photoId = encodePhotoId(sanitizedBrand, sanitizedSession, filename);
+        
+        // Generate unique photo ID
+        const s3Key = `photobooth/${sanitizedBrand}/${sanitizedSession}/${timestampDir}/${filename}.jpg`;
 
         // Create presigned URL for upload
         const putCommand = new PutObjectCommand({
@@ -77,7 +84,6 @@ export async function POST(request: NextRequest) {
         })
 
     } catch (error) {
-
         return NextResponse.json(
             { error: 'Request failed' },
             { status: 500}
