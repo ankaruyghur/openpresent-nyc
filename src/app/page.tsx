@@ -92,7 +92,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen bg-black flex items-center justify-center relative">
 
       <video
         ref={video1Ref}
@@ -124,13 +124,26 @@ export default function Home() {
 
       <div className={`text-center px-8 transition-transform duration-500 ${isShaking ? 'animate-pulse' : ''}`}>
         <div className="mb-12">
-          <h1 className="text-4xl md:text-6xl font-black text-white mb-4 tracking-widest" style={{fontFamily: 'Impact, "Arial Black", sans-serif'}}>
+          <h1 className="text-6xl md:text-8xl font-black text-white mb-4 tracking-widest" style={{fontFamily: 'Impact, "Arial Black", sans-serif'}}>
             OPEN SOON
           </h1>
-          <div className="w-24 h-0.5 bg-white mx-auto mb-8"></div>
+          <div className="w-50 h-0.5 bg-white mx-auto mb-12"></div>
+          
+          {/* Logo under the line */}
+          <div className="flex justify-center mb-2">
+            <img 
+              src="/branding/OP_WHITE.PNG" 
+              alt="Open Present Logo" 
+              className="h-9 w-auto"
+              style={{ 
+                filter: 'brightness(0) invert(1)',
+                transform: 'scale(3.5)'
+              }}
+            />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6" suppressHydrationWarning>
+        <form onSubmit={handleSubmit} className="space-y-6 mt-1" suppressHydrationWarning>
           <div className="relative">
             <input
               type="password"

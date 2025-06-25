@@ -11,15 +11,15 @@ export default function PhotoActions({ photoUrl, fileName }: PhotoActionsProps) 
       try {
         await navigator.share({
           title: 'Check out my photo!',
+          text: 'Check out this awesome photo!',
           url: window.location.href
         });
-      } catch (error) {
+      } catch {
         // User cancelled share
       }
     } else {
-      // Fallback: copy to clipboard
-      await navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+      // Fallback for development/HTTP environments
+      alert(`Share this link: ${window.location.href}`);
     }
   };
 
@@ -28,14 +28,14 @@ export default function PhotoActions({ photoUrl, fileName }: PhotoActionsProps) 
       <a
         href={photoUrl}
         download={fileName}
-        className="bg-purple-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-purple-700 transition-colors text-center shadow-lg"
+        className="bg-zinc-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-purple-700 transition-colors text-center shadow-lg"
       >
         Download Photo
       </a>
       
       <button
         onClick={handleShare}
-        className="bg-blue-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-center shadow-lg"
+        className="bg-white-900 text-zinc-900 px-8 py-4 rounded-xl font-semibold hover:bg-blue-700 transition-colors text-center shadow-lg"
       >
         Share Photo
       </button>

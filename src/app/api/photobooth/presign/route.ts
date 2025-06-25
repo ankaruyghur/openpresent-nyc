@@ -15,7 +15,7 @@ async function validateAWSConnection() {
     try {
         await s3Client.send(new HeadBucketCommand({ Bucket: BUCKET_NAME }));
         return true;
-    } catch (error) {
+    } catch {
         return false;
     }
 }
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
             expiresIn:600
         })
 
-    } catch (error) {
+    } catch {
         return NextResponse.json(
             { error: 'Request failed' },
             { status: 500}

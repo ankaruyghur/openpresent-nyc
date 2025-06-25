@@ -1,5 +1,4 @@
 import crypto from 'crypto'
-import { buffer } from 'stream/consumers';
 
 
 const ALGORITHM = 'aes-128-ctr';
@@ -28,7 +27,7 @@ export function encodePhotoId(brand: string, session: string, timestamp: string)
 
         // URL safe with base64 encoding
         return Buffer.from(combined, 'hex').toString('base64url');
-    } catch (error) {
+    } catch {
         throw new Error('Failed to encode photo ID')
     }
 }
@@ -56,7 +55,7 @@ export function decodePhotoId(encryptedId: string): { brand: string; session: st
 
         return { brand, session, timestampDir, filename};
 
-    } catch (error) {
+    } catch {
         throw new Error('Failed to decode photo ID - invalid or corrupted data');
     }
 }
