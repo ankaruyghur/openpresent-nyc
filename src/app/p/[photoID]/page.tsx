@@ -31,7 +31,7 @@ export default async function PhotoPage({ params }: { params: Promise<{ photoID:
 
   const sanitizedBrand = photoData.brand.replace(/[^\w-]/g, '_');
   const sanitizedSession = photoData.session.replace(/[^\w-]/g, '_');
-  const cloudfrontDomain = process.env.CLOUDFRONT_DOMAIN_NAME!;
+  const cloudfrontDomain = process.env.CLOUDFRONT_DOMAIN_PHOTOBOOTH!;
   const photoUrl = `https://${cloudfrontDomain}/${sanitizedBrand}/${sanitizedSession}/${photoData.timestampDir}/${photoData.filename}.jpg`;
 
   // Format timestamp for display
