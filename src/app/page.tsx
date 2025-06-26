@@ -13,7 +13,7 @@ export default function Home() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const video1Ref = useRef<HTMLVideoElement>(null);
   const video2Ref = useRef<HTMLVideoElement>(null);
-  const transitionDuration = 0.5; // in seconds
+  const transitionDuration = 1; // in seconds
 
 
   const handleSubmit = (e: React.FormEvent) => {

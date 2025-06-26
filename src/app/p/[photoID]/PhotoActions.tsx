@@ -26,7 +26,7 @@ export default function PhotoActions({ photoUrl, fileName }: PhotoActionsProps) 
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-center">
       <a
-        href={photoUrl}
+        href={photoUrl}  // TODO: vulnerable cloudfront url
         download={fileName}
         className="bg-zinc-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-purple-700 transition-colors text-center shadow-lg"
       >
