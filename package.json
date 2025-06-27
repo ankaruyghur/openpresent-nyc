@@ -1,5 +1,7 @@
 {
   "name": "openpresent-nyc",
+  "description": "Open Present | Creative Solutions",
+  "author": "Ankar Uyghur of Open Present",
   "version": "0.1.0",
   "private": true,
   "scripts": {

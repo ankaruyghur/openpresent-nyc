@@ -10,8 +10,8 @@ export default function PhotoActions({ photoUrl, fileName }: PhotoActionsProps) 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Check out my photo!',
-          text: 'Check out this awesome photo!',
+          title: 'Your Photo | Open Present',
+          text: 'View and share your OP photobooth photo',
           url: window.location.href
         });
       } catch {
