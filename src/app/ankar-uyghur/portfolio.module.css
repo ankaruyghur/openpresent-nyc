@@ -1,0 +1,31 @@
+@media (max-width: 1023px) {
+    .portfolio-bg {
+        background-size: 100% auto !important;
+        background-image: url('/portfolio/BackDrop-Mobile.jpg') !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .portfolio-bg {
+        background-size: 100% auto !important;
+        background-image: url('/portfolio/BackDrop-Test.jpg') !important;
+    }
+}
+
+.scroll-container {
+    scroll-snap-type: y mandatory;
+    height: 100vh;
+    overflow-y: scroll;
+    /* Hide scrollbar */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.scroll-container::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari, Opera */
+}
+
+.section {
+    scroll-snap-align: start;
+    min-height: 100vh;
+}
