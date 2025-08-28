@@ -14,10 +14,10 @@ export default function Portfolio() {
     const [isMobile, setIsMobile] = useState(false);
     const [project1Expanded, setProject1Expanded] = useState(false);
     const [project2Expanded, setProject2Expanded] = useState(false);
-    const [project3Expanded, setProject3Expanded] = useState(false);
+    const [_project3Expanded, _setProject3Expanded] = useState(false);
     const [project1CardOpen, setProject1CardOpen] = useState(false);
     const [project2CardOpen, setProject2CardOpen] = useState(false);
-    const [project3CardOpen, setProject3CardOpen] = useState(false);
+    const [_project3CardOpen, _setProject3CardOpen] = useState(false);
     const project1Ref = useRef<HTMLDivElement>(null);
     const project2Ref = useRef<HTMLDivElement>(null);
 
@@ -158,7 +158,7 @@ export default function Portfolio() {
               content: (
                   <div className='h-[50vh]'>
                       <p className="text-neutral-400 text-base md:text-lg font-sans max-w-3xl mx-auto mb-2">
-                            Made from olive 1" nylon, cobra buckle sourced from AustriAlpin with adjustable D-rings.
+                            Made from olive 1&quot; nylon, cobra buckle sourced from AustriAlpin with adjustable D-rings.
                       </p>
                       <img
                           src="/portfolio/projects/misc/CobraBelt.jpg"
@@ -380,7 +380,7 @@ export default function Portfolio() {
               )
           }}
           index={0}
-          onOpenChange={setProject3CardOpen}
+          onOpenChange={_setProject3CardOpen}
       />,
       <Card
           key="tech-2"
@@ -407,7 +407,7 @@ export default function Portfolio() {
               )
           }}
           index={1}
-          onOpenChange={setProject3CardOpen}
+          onOpenChange={_setProject3CardOpen}
       />,
       <Card
           key="tech-3"
@@ -430,7 +430,7 @@ export default function Portfolio() {
               )
           }}
           index={2}
-          onOpenChange={setProject3CardOpen}
+          onOpenChange={_setProject3CardOpen}
       />,
       <Card
           key="tech-4"
@@ -453,7 +453,7 @@ export default function Portfolio() {
               )
           }}
           index={3}
-          onOpenChange={setProject3CardOpen}
+          onOpenChange={_setProject3CardOpen}
       />,
   ];
 
@@ -538,11 +538,11 @@ export default function Portfolio() {
                         </div>
 
                         <p className={`scroll-snap-align-start indent-8 text-l leading-relaxed text-left max-w-3xl px-4 py-2`}>
-                            While 'uniform' typically suggests conformity, I see it differently. Each individual's uniform embodies their own codex of principles. 
+                            While &lsquo;uniform&rsquo; typically suggests conformity, I see it differently. Each individual&rsquo;s uniform embodies their own codex of principles. 
                             My personal focus is on tailoring garments, uniforms, that hold weight and is worn with the intent and resolve to uphold the principles embedded within it.
                         </p>
                         <p className="scroll-snap-align-start indent-8 text-l leading-relaxed text-left max-w-3xl px-4 pb-8 mb-16 md:mb-8">
-                            As a first-generation immigrant born in former East Turkestan, I'm quick to learn and adapt to any environment. I'm a driven and diligent eternal-student 
+                            As a first-generation immigrant born in former East Turkestan, I&rsquo;m quick to learn and adapt to any environment. I&rsquo;m a driven and diligent eternal-student 
                             who loves nothing more than to be challenged with a difficult problem. As a self-taught sewer with experience in machine operation, alterations, and constructing original designs, 
                             I am looking for opportunities to grow professionally through positions in production sewing, alterations, garment assembly, finisher/trimmer, cutter, and any other ways of making use of my wide skillset.
                         </p>
@@ -718,7 +718,7 @@ export default function Portfolio() {
                 <div className="space-y-6">
                     <div className="bg-black/70 backdrop-blur-sm border border-white/20 rounded-lg p-6 max-w-4xl">
                         <p className="text-white text-lg leading-relaxed">
-                            As the eldest son of a family of first-generation immigrants, I'm unavailable from 9AM to 5PM, from Mondays to Fridays at the moment as I have a responsibility of helping support my family and my siblings' education. Although for those 40 hours I will be unavailable, as someone who balances multiple commitments successfully, I can guarantee dedicated focus and quality output during the remaining 72 waking hours of my week.
+                            As the eldest son of a family of first-generation immigrants, I&rsquo;m unavailable from 9AM to 5PM, from Mondays to Fridays at the moment as I have a responsibility of helping support my family and my siblings&rsquo; education. Although for those 40 hours I will be unavailable, as someone who balances multiple commitments successfully, I can guarantee dedicated focus and quality output during the remaining 72 waking hours of my week.
                         </p>
                     </div>
                     

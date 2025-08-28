@@ -167,7 +167,7 @@ export const Card = ({
 }: CardProps) => {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const { onCardClose, currentIndex } = useContext(CarouselContext);
+  const { onCardClose, currentIndex: _currentIndex } = useContext(CarouselContext);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -287,7 +287,7 @@ export const BlurImage = ({
   src,
   className,
   alt,
-  fill,
+  fill: _fill,
   ...rest
 }: BlurImageProps) => {
   const [isLoading, setLoading] = useState(true);

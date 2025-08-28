@@ -3,9 +3,9 @@
 /* eslint-disable react/no-unknown-property */
 import React, { forwardRef, useMemo, useRef, useLayoutEffect, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree, RootState } from "@react-three/fiber";
-// @ts-ignore
+// @ts-expect-error - Three.js types may not be fully compatible
 import { Color, Mesh, ShaderMaterial } from "three";
-// @ts-ignore
+// @ts-expect-error - Three.js types may not be fully compatible
 import { IUniform } from "three";
 import { cn } from '@/lib/utils';
 
@@ -153,7 +153,7 @@ export const SilkBackground = forwardRef<HTMLDivElement, SilkBackgroundProps>(({
   noiseIntensity = 1.5,
   rotation = 0,
   ...props
-}, ref) => {
+}, _ref) => {
   // props already contains only DOM props after destructuring above
   const domProps = props;
 
