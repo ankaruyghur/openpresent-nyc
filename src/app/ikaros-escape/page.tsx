@@ -150,6 +150,7 @@ function HighlightsSection() {
     const rest = CLIPS.filter(c => !c.featured);
 
     const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
+        e.preventDefault();
         const video = e.currentTarget;
         if (activeVideoRef.current && activeVideoRef.current !== video) {
             activeVideoRef.current.pause();
@@ -157,6 +158,8 @@ function HighlightsSection() {
         if (video.paused) {
             video.play();
             activeVideoRef.current = video;
+        } else {
+            video.pause();
         }
     };
 
