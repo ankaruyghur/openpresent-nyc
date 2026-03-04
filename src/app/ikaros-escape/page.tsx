@@ -157,12 +157,12 @@ function HighlightsSection() {
         activeVideoRef.current = video;
     };
 
-    const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
-        const video = e.currentTarget;
-        if (video.paused) {
-            video.play();
-        } else {
-            video.pause();
+    const [startedVideos, setStartedVideos] = useState<Set<string>>(new Set());
+
+    const handleOverlayClick = (src: string, videoEl: HTMLVideoElement | null) => {
+        if (videoEl) {
+            videoEl.play();
+            setStartedVideos(prev => new Set(prev).add(src));
         }
     };
 
@@ -187,17 +187,32 @@ function HighlightsSection() {
                             transition={{ delay: i * 0.1, duration: 0.4 }}
                             className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-4"
                         >
-                            <video
-                                className="w-full aspect-video rounded-lg mb-3 cursor-pointer"
-                                poster={clip.poster}
-                                preload="none"
-                                controls
-                                playsInline
-                                onPlay={handleVideoPlay}
-                                onClick={handleVideoClick}
-                            >
-                                <source src={clip.src} type="video/mp4" />
-                            </video>
+                            <div className="relative mb-3">
+                                <video
+                                    ref={el => { if (el) el.dataset.src = clip.src; }}
+                                    className="w-full aspect-video rounded-lg"
+                                    poster={clip.poster}
+                                    preload="none"
+                                    controls={startedVideos.has(clip.src)}
+                                    playsInline
+                                    onPlay={handleVideoPlay}
+                                >
+                                    <source src={clip.src} type="video/mp4" />
+                                </video>
+                                {!startedVideos.has(clip.src) && (
+                                    <div
+                                        className="absolute inset-0 cursor-pointer rounded-lg flex items-center justify-center"
+                                        onClick={(e) => {
+                                            const video = (e.currentTarget.previousElementSibling as HTMLVideoElement);
+                                            handleOverlayClick(clip.src, video);
+                                        }}
+                                    >
+                                        <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                            <div className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                             <p className="text-zinc-400 text-sm">{clip.context}</p>
                         </motion.div>
                     ))}
@@ -228,17 +243,31 @@ function HighlightsSection() {
                                         transition={{ delay: i * 0.06, duration: 0.4 }}
                                         className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-4"
                                     >
+                                        <div className="relative mb-3">
                                         <video
-                                            className="w-full aspect-video rounded-lg mb-3 cursor-pointer"
+                                            className="w-full aspect-video rounded-lg"
                                             poster={clip.poster}
                                             preload="none"
-                                            controls
+                                            controls={startedVideos.has(clip.src)}
                                             playsInline
                                             onPlay={handleVideoPlay}
-                                            onClick={handleVideoClick}
                                         >
                                             <source src={clip.src} type="video/mp4" />
                                         </video>
+                                        {!startedVideos.has(clip.src) && (
+                                            <div
+                                                className="absolute inset-0 cursor-pointer rounded-lg flex items-center justify-center"
+                                                onClick={(e) => {
+                                                    const video = (e.currentTarget.previousElementSibling as HTMLVideoElement);
+                                                    handleOverlayClick(clip.src, video);
+                                                }}
+                                            >
+                                                <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                                                    <div className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
+                                                </div>
+                                            </div>
+                                        )}
+                                        </div>
                                         <p className="text-zinc-400 text-sm">{clip.context}</p>
                                     </motion.div>
                                 ))}
