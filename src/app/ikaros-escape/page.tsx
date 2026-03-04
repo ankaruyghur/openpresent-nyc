@@ -149,18 +149,12 @@ function HighlightsSection() {
     const featured = CLIPS.filter(c => c.featured);
     const rest = CLIPS.filter(c => !c.featured);
 
-    const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
-        e.preventDefault();
+    const handleVideoPlay = (e: React.SyntheticEvent<HTMLVideoElement>) => {
         const video = e.currentTarget;
         if (activeVideoRef.current && activeVideoRef.current !== video) {
             activeVideoRef.current.pause();
         }
-        if (video.paused) {
-            video.play();
-            activeVideoRef.current = video;
-        } else {
-            video.pause();
-        }
+        activeVideoRef.current = video;
     };
 
     return (
@@ -190,7 +184,7 @@ function HighlightsSection() {
                                 preload="none"
                                 controls
                                 playsInline
-                                onClick={handleVideoClick}
+                                onPlay={handleVideoPlay}
                             >
                                 <source src={clip.src} type="video/mp4" />
                             </video>
@@ -230,7 +224,7 @@ function HighlightsSection() {
                                             preload="none"
                                             controls
                                             playsInline
-                                            onClick={handleVideoClick}
+                                            onPlay={handleVideoPlay}
                                         >
                                             <source src={clip.src} type="video/mp4" />
                                         </video>
