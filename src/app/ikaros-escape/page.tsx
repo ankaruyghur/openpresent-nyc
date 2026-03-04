@@ -157,6 +157,15 @@ function HighlightsSection() {
         activeVideoRef.current = video;
     };
 
+    const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
+        const video = e.currentTarget;
+        if (video.paused) {
+            video.play();
+        } else {
+            video.pause();
+        }
+    };
+
     return (
         <div className="px-6 md:px-12 py-12 border-t border-white/5">
             <motion.div
@@ -185,6 +194,7 @@ function HighlightsSection() {
                                 controls
                                 playsInline
                                 onPlay={handleVideoPlay}
+                                onClick={handleVideoClick}
                             >
                                 <source src={clip.src} type="video/mp4" />
                             </video>
@@ -225,6 +235,7 @@ function HighlightsSection() {
                                             controls
                                             playsInline
                                             onPlay={handleVideoPlay}
+                                            onClick={handleVideoClick}
                                         >
                                             <source src={clip.src} type="video/mp4" />
                                         </video>
