@@ -102,14 +102,9 @@ const CLIPS = [
     },
     // More clips (revealed on click)
     {
-        context: 'JERSEY ENERGY',
-        src: '/epk/clips/aapi-jersey-drop-crowd-dances-hype-drop.mp4',
-        poster: '/epk/clips/aapi-jersey-drop-crowd-dances-hype-drop-poster.jpg',
-    },
-    {
-        context: 'SYRIAN CLUB',
-        src: '/epk/clips/aapi-omar-suleyman-lebanese-club-music-with-people-dancing.mp4',
-        poster: '/epk/clips/aapi-omar-suleyman-lebanese-club-music-with-people-dancing-poster.jpg',
+        context: 'SUPER SHARP SHOOTER',
+        src: '/epk/clips/JUNGLEJUNLGE-crazy-jungle-drop-crowd-goes-crazy.mp4',
+        poster: '/epk/clips/JUNGLEJUNLGE-crazy-jungle-drop-crowd-goes-crazy-poster.jpg',
     },
     {
         context: 'UYGHUR RAGGAETON',
@@ -117,14 +112,19 @@ const CLIPS = [
         poster: '/epk/clips/aapi-uyghur-raggeton-crowd-shaking-ass-poster.jpg',
     },
     {
+        context: 'SYRIAN CLUB',
+        src: '/epk/clips/aapi-omar-suleyman-lebanese-club-music-with-people-dancing.mp4',
+        poster: '/epk/clips/aapi-omar-suleyman-lebanese-club-music-with-people-dancing-poster.jpg',
+    },
+    {
         context: 'TOM N JERRY',
         src: '/epk/clips/JUNGLEJUNGLE-between-the-sheets-jungle-flip-playing-with-hotcue-samples-on-cdj.mp4',
         poster: '/epk/clips/JUNGLEJUNGLE-between-the-sheets-jungle-flip-playing-with-hotcue-samples-on-cdj-poster.jpg',
     },
     {
-        context: 'SUPER SHARP SHOOTER',
-        src: '/epk/clips/JUNGLEJUNLGE-crazy-jungle-drop-crowd-goes-crazy.mp4',
-        poster: '/epk/clips/JUNGLEJUNLGE-crazy-jungle-drop-crowd-goes-crazy-poster.jpg',
+        context: 'JERSEY ENERGY',
+        src: '/epk/clips/aapi-jersey-drop-crowd-dances-hype-drop.mp4',
+        poster: '/epk/clips/aapi-jersey-drop-crowd-dances-hype-drop-poster.jpg',
     },
     {
         context: 'TEYANA TAYLOR - WTP',
@@ -384,8 +384,11 @@ export default function IkarosEscapeEPK() {
                     >
                         {/* Bio + Genre */}
                         <div>
+                            <p className="text-zinc-300 text-base md:text-lg leading-relaxed mb-2 max-w-md">
+                                Uyghur artist based in Brooklyn.
+                            </p>
                             <p className="text-zinc-300 text-base md:text-lg leading-relaxed mb-6 max-w-md">
-                                Uyghur artist based in Brooklyn. As someone from a diaspora with a culture actively being erased, music became the way in. 90s soulful house for its message of freedom and love. Jungle for the way it tears apart tradition and rebuilds it into something new.
+                                As someone from a diaspora with a culture actively being erased, I found freedom through sound. Soulful house for its message of love and liberation. Jungle for the way it tears apart tradition and rebuilds it into something new. That same drive carries beyond the booth. Freedom isn&apos;t just what I play, it&apos;s what I fight for.
                             </p>
                             <p className="text-zinc-300 text-base md:text-lg leading-relaxed mb-6 max-w-md -mt-4">
                                 DJ, producer, and founder of Open Present.
