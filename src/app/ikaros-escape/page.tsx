@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import styles from './epk.module.css';
 import { Noise } from "@/components/ui/shadcn-io/noise";
@@ -76,8 +76,172 @@ const SHOWS = [
     {
         name: 'OP SOUNDS',
         detail: 'Mixed Digital + Vinyl Set @ Hi-Note Radio (Listening Bar)',
+        url: 'https://youtu.be/nID327THfqo?si=HG-7mBq3Uo55firL',
     },
 ];
+
+const CLIPS = [
+    // Featured (shown by default)
+    {
+        context: 'BOLERO DUB',
+        src: '/epk/clips/JUNGLEJUNLGE-bolero-jungle-drop-aura-also-hype-ass-drop.mp4',
+        poster: '/epk/clips/JUNGLEJUNLGE-bolero-jungle-drop-aura-also-hype-ass-drop-poster.jpg',
+        featured: true,
+    },
+    {
+        context: 'BETWEEN THE SHEETS JERSEY CLUB',
+        src: '/epk/clips/aapi-crazy-crowd-dance-clap-jersey-music-ENERGY-VIBES-ULTIMATE.mp4',
+        poster: '/epk/clips/aapi-crazy-crowd-dance-clap-jersey-music-ENERGY-VIBES-ULTIMATE-poster.jpg',
+        featured: true,
+    },
+    {
+        context: 'OP SOUNDS @ HI-NOTE RADIO',
+        src: '/epk/clips/hinote-03-slow-vinyl-transition.mp4',
+        poster: '/epk/clips/hinote-03-slow-vinyl-transition-poster.jpg',
+        featured: true,
+    },
+    // More clips (revealed on click)
+    {
+        context: 'JERSEY ENERGY',
+        src: '/epk/clips/aapi-jersey-drop-crowd-dances-hype-drop.mp4',
+        poster: '/epk/clips/aapi-jersey-drop-crowd-dances-hype-drop-poster.jpg',
+    },
+    {
+        context: 'SYRIAN CLUB',
+        src: '/epk/clips/aapi-omar-suleyman-lebanese-club-music-with-people-dancing.mp4',
+        poster: '/epk/clips/aapi-omar-suleyman-lebanese-club-music-with-people-dancing-poster.jpg',
+    },
+    {
+        context: 'UYGHUR RAGGAETON',
+        src: '/epk/clips/aapi-uyghur-raggeton-crowd-shaking-ass.mp4',
+        poster: '/epk/clips/aapi-uyghur-raggeton-crowd-shaking-ass-poster.jpg',
+    },
+    {
+        context: 'TOM N JERRY',
+        src: '/epk/clips/JUNGLEJUNGLE-between-the-sheets-jungle-flip-playing-with-hotcue-samples-on-cdj.mp4',
+        poster: '/epk/clips/JUNGLEJUNGLE-between-the-sheets-jungle-flip-playing-with-hotcue-samples-on-cdj-poster.jpg',
+    },
+    {
+        context: 'SUPER SHARP SHOOTER',
+        src: '/epk/clips/JUNGLEJUNLGE-crazy-jungle-drop-crowd-goes-crazy.mp4',
+        poster: '/epk/clips/JUNGLEJUNLGE-crazy-jungle-drop-crowd-goes-crazy-poster.jpg',
+    },
+    {
+        context: 'TEYANA TAYLOR - WTP',
+        src: '/epk/clips/hinote-01-digital-transitino-but-nice-track.mp4',
+        poster: '/epk/clips/hinote-01-digital-transitino-but-nice-track-poster.jpg',
+    },
+    {
+        context: 'TAKUYA NAKAMURA',
+        src: '/epk/clips/JUNGLEJUNGLE-takuya-nakamura-pulls-up-and-i-introduce-him-to-the-crowd-and-crowd-cheers.mp4',
+        poster: '/epk/clips/JUNGLEJUNGLE-takuya-nakamura-pulls-up-and-i-introduce-him-to-the-crowd-and-crowd-cheers-poster.jpg',
+    },
+    {
+        context: 'HAPPY BIRTHDAY',
+        src: '/epk/clips/JUNGLEJUNGLE-singing-happy-borthday-in-theclub-with-a-cake-crowd-moment.mp4',
+        poster: '/epk/clips/JUNGLEJUNGLE-singing-happy-borthday-in-theclub-with-a-cake-crowd-moment-poster.jpg',
+    },
+];
+
+function HighlightsSection() {
+    const [showAll, setShowAll] = useState(false);
+    const activeVideoRef = useRef<HTMLVideoElement | null>(null);
+    const featured = CLIPS.filter(c => c.featured);
+    const rest = CLIPS.filter(c => !c.featured);
+
+    const handleVideoClick = (e: React.MouseEvent<HTMLVideoElement>) => {
+        const video = e.currentTarget;
+        if (activeVideoRef.current && activeVideoRef.current !== video) {
+            activeVideoRef.current.pause();
+        }
+        if (video.paused) {
+            video.play();
+            activeVideoRef.current = video;
+        }
+    };
+
+    return (
+        <div className="px-6 md:px-12 py-12 border-t border-white/5">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+            >
+                <h2 className="text-3xl md:text-4xl font-bold text-zinc-100 mb-6">Highlights</h2>
+
+                {/* Featured clips */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {featured.map((clip, i) => (
+                        <motion.div
+                            key={clip.src}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: i * 0.1, duration: 0.4 }}
+                            className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-4"
+                        >
+                            <video
+                                className="w-full aspect-video rounded-lg mb-3 cursor-pointer"
+                                poster={clip.poster}
+                                preload="none"
+                                controls
+                                playsInline
+                                onClick={handleVideoClick}
+                            >
+                                <source src={clip.src} type="video/mp4" />
+                            </video>
+                            <p className="text-zinc-400 text-sm">{clip.context}</p>
+                        </motion.div>
+                    ))}
+                </div>
+
+                {/* More clips (expandable) */}
+                {rest.length > 0 && (
+                    <>
+                        <button
+                            onClick={() => setShowAll(!showAll)}
+                            className="mt-6 px-5 py-2.5 text-sm text-zinc-400 hover:text-white border border-white/10 hover:border-white/30 rounded-lg transition-all"
+                        >
+                            {showAll ? 'Show Less' : `More Clips (${rest.length})`}
+                        </button>
+
+                        {showAll && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4 }}
+                                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4"
+                            >
+                                {rest.map((clip, i) => (
+                                    <motion.div
+                                        key={clip.src}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.06, duration: 0.4 }}
+                                        className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-xl p-4"
+                                    >
+                                        <video
+                                            className="w-full aspect-video rounded-lg mb-3 cursor-pointer"
+                                            poster={clip.poster}
+                                            preload="none"
+                                            controls
+                                            playsInline
+                                            onClick={handleVideoClick}
+                                        >
+                                            <source src={clip.src} type="video/mp4" />
+                                        </video>
+                                        <p className="text-zinc-400 text-sm">{clip.context}</p>
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        )}
+                    </>
+                )}
+            </motion.div>
+        </div>
+    );
+}
 
 const PRESS = [
     { text: 'New York Times, Dec 2022', url: 'https://www.nytimes.com/2022/12/05/nyregion/new-york-china-protests.html', igUrl: 'https://www.instagram.com/p/ClzLy41OAz_?img_index=2' },
@@ -296,11 +460,25 @@ export default function IkarosEscapeEPK() {
                                         <span>SoundCloud</span>
                                     </a>
                                 </Magnetic>
+                                <Magnetic strength={0.03} range={200}>
+                                    <a
+                                        href="https://www.youtube.com/@IkarosEscape"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors text-sm bg-white/5 px-4 py-2 rounded-lg border border-white/10 hover:border-white/30"
+                                    >
+                                        <IconBrandYoutube className="w-4 h-4" />
+                                        <span>YouTube</span>
+                                    </a>
+                                </Magnetic>
                             </div>
                         </div>
                     </motion.div>
                 </div>
             </div>
+
+            {/* ============ HIGHLIGHTS (CLIPS) ============ */}
+            <HighlightsSection />
 
             {/* ============ PAGE 2: SETS ============ */}
             <div className="px-6 md:px-12 py-12 border-t border-white/5">
