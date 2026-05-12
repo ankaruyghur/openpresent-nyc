@@ -1,0 +1,9 @@
+/* Hide scrollbars on scrollable containers within Jae Cha's portfolio. */
+.jae-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.jae-scroll::-webkit-scrollbar {
+  display: none;
+}
