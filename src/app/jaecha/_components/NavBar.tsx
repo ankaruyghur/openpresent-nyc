@@ -96,7 +96,7 @@ export function NavBar() {
               return (
                 <div
                   key={s.label}
-                  style={{ position: 'relative' }}
+                  style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
                   onMouseEnter={openDropdown}
                   onMouseLeave={closeDropdown}
                 >
