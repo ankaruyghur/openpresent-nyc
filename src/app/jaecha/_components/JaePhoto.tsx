@@ -7,20 +7,15 @@ import type { JaePhoto as JaePhotoMeta, PhotoSize } from './photo-types';
 const CLOUDFRONT_DOMAIN = process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN_WEB;
 
 /**
- * Cache-bust version. Bump when the *content* at existing S3 keys changes
- * (e.g. a force re-upload swaps the photo at `bts-aps-1` for a different
- * shot). Appended as a query string so Next/Image and Vercel's optimizer
- * treat the new content as a different URL and re-fetch from CloudFront.
- *
- * Pure URL-level cache buster — does not affect S3 keys or CloudFront caching
- * behavior, only the optimizer's per-URL cache.
- */
-const PHOTO_VERSION = '2';
-
-/**
  * Resolve a photo + size to its full public URL. Format defaults to AVIF;
  * Next.js's image optimizer transparently falls back to WebP for older clients
  * because of `images.formats` in next.config.ts.
+ *
+ * If the *content* at existing S3 keys changes (force re-upload swaps the
+ * photo at an existing slug), Vercel's image optimizer will keep serving its
+ * cached output for the unchanged URL. Purge it via Vercel dashboard →
+ * Storage → Image Optimization → Purge with a wildcard path
+ * (e.g. `https://<cloudfront-domain>/jaecha/*`).
  */
 export function photoUrl(photo: JaePhotoMeta, size: PhotoSize, format: 'avif' | 'webp' = 'avif'): string {
   if (!CLOUDFRONT_DOMAIN) {
@@ -29,7 +24,7 @@ export function photoUrl(photo: JaePhotoMeta, size: PhotoSize, format: 'avif' | 
     // instead of silently breaking every photo.
     throw new Error('NEXT_PUBLIC_CLOUDFRONT_DOMAIN_WEB is not set — Jae\'s photos cannot resolve. Check .env.local / Vercel project env.');
   }
-  return `https://${CLOUDFRONT_DOMAIN}/${photo.basePath}-${size}.${format}?v=${PHOTO_VERSION}`;
+  return `https://${CLOUDFRONT_DOMAIN}/${photo.basePath}-${size}.${format}`;
 }
 
 type Props = {
