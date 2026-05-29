@@ -38,35 +38,59 @@ function categoryHref(project: Project): { href: string; label: string } {
 }
 
 /**
- * Pack a photo set into mixed layout rows (full / wide / pair / trio).
- * Deterministic per project id so revisiting renders the same layout.
- * `allowMultiCol=false` on mobile collapses everything to single-column rows.
+ * Pack a photo set into mixed layout rows (full / wide / pair / trio) while
+ * matching each photo to a slot that suits its orientation.
+ *
+ * Rules:
+ *   - Portrait (aspect < 0.85): `full` slot (1100×580) — closest fit without
+ *     forcing landscape crop. Pairs only with another adjacent portrait.
+ *   - Landscape (aspect > 1.2): `wide` slot (1100×420) — preserves wide framing.
+ *     Pairs/trios only when the next 1 or 2 photos are also landscape.
+ *   - Square (0.85–1.2): `full` slot — fits cleanly in the tall box.
+ *
+ * Order is never changed — we step through `photos` in array order so Jae's
+ * curated sequence is preserved exactly. `allowMultiCol=false` on mobile
+ * collapses everything to single-column rows.
  */
-function buildLayout(project: Project, photoCount: number, allowMultiCol: boolean): Row[] {
-  if (photoCount <= 0) return [];
+function buildLayout(photos: JaePhotoMeta[], allowMultiCol: boolean): Row[] {
+  if (photos.length === 0) return [];
   const rows: Row[] = [];
-  let remaining = photoCount;
-  let idx = 0;
-  rows.push({ type: 'full', idx: idx++ });
-  remaining--;
-  while (remaining > 0) {
-    const r = (idx * 7 + project.id.charCodeAt(0)) % 4;
-    if (allowMultiCol && r === 0 && remaining >= 2) {
-      rows.push({ type: 'pair', idx1: idx, idx2: idx + 1 });
-      idx += 2;
-      remaining -= 2;
-    } else if (allowMultiCol && r === 1 && remaining >= 3) {
-      rows.push({ type: 'trio', idx1: idx, idx2: idx + 1, idx3: idx + 2 });
-      idx += 3;
-      remaining -= 3;
-    } else if (r === 2) {
-      rows.push({ type: 'wide', idx: idx++ });
-      remaining--;
-    } else {
-      rows.push({ type: 'full', idx: idx++ });
-      remaining--;
+  let i = 0;
+
+  const aspect = (p: JaePhotoMeta) => p.width / p.height;
+  const isLandscape = (p: JaePhotoMeta) => aspect(p) > 1.2;
+  const isPortrait = (p: JaePhotoMeta) => aspect(p) < 0.85;
+
+  while (i < photos.length) {
+    const p1 = photos[i];
+    const p2 = photos[i + 1];
+    const p3 = photos[i + 2];
+
+    if (allowMultiCol && p2 && p3 && isLandscape(p1) && isLandscape(p2) && isLandscape(p3)) {
+      rows.push({ type: 'trio', idx1: i, idx2: i + 1, idx3: i + 2 });
+      i += 3;
+      continue;
     }
+    if (allowMultiCol && p2 && isLandscape(p1) && isLandscape(p2)) {
+      rows.push({ type: 'pair', idx1: i, idx2: i + 1 });
+      i += 2;
+      continue;
+    }
+    if (allowMultiCol && p2 && isPortrait(p1) && isPortrait(p2)) {
+      rows.push({ type: 'pair', idx1: i, idx2: i + 1 });
+      i += 2;
+      continue;
+    }
+    if (isLandscape(p1)) {
+      rows.push({ type: 'wide', idx: i });
+      i++;
+      continue;
+    }
+    // Portrait or square → tall full slot.
+    rows.push({ type: 'full', idx: i });
+    i++;
   }
+
   return rows;
 }
 
@@ -79,8 +103,8 @@ export default function ProjectDetail() {
   const photos = useMemo(() => (project ? getProjectPhotos(project.id) : []), [project]);
 
   const layout = useMemo(
-    () => (project ? buildLayout(project, photos.length, !isMobile) : []),
-    [project, photos.length, isMobile],
+    () => (project ? buildLayout(photos, !isMobile) : []),
+    [project, photos, isMobile],
   );
 
   if (!project || project.id === INFO_PROJECT_ID) {
@@ -95,36 +119,60 @@ export default function ProjectDetail() {
   const back = categoryHref(project);
   const pad = isMobile ? 20 : 80;
 
+  /**
+   * Render a photo at its true aspect ratio inside a slot box. The wrapper
+   * has the slot's max width/height; the photo is sized to fit inside without
+   * cropping (whichever dimension is the binding constraint).
+   */
   function PhotoTile({
     photo,
-    width,
-    height,
+    maxWidth,
+    maxHeight,
     sizes,
     label,
     priority,
   }: {
     photo: JaePhotoMeta;
-    width: string;
-    height: number;
+    /** Slot max width — CSS string (e.g. "100%", "50%") or px number. */
+    maxWidth: string | number;
+    /** Slot max height in px. The photo will never exceed this. */
+    maxHeight: number;
     sizes: string;
     label: string;
     priority?: boolean;
   }) {
+    const aspect = photo.width / photo.height;
+    // Compute the actual rendered photo size, capped by both axes.
+    // Use a CSS variable so width="50%" still works for paired layouts.
+    const widthStyle = typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth;
     return (
       <div
-        role="button"
-        tabIndex={0}
-        aria-label={`Zoom into ${label}`}
-        onClick={() => setZoomed(photo)}
-        onKeyDown={activateOnKey(() => setZoomed(photo))}
         style={{
-          width,
-          height,
-          position: 'relative',
-          cursor: 'zoom-in',
+          flex: typeof maxWidth === 'string' && maxWidth.endsWith('%') ? `0 1 ${maxWidth}` : `0 0 ${widthStyle}`,
+          maxWidth: widthStyle,
+          display: 'flex',
+          justifyContent: 'center',
         }}
       >
-        <JaePhoto photo={photo} size="medium" sizes={sizes} priority={priority} />
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Zoom into ${label}`}
+          onClick={() => setZoomed(photo)}
+          onKeyDown={activateOnKey(() => setZoomed(photo))}
+          style={{
+            // Photo box: respect the actual aspect ratio, bounded by slot.
+            aspectRatio: `${photo.width} / ${photo.height}`,
+            maxHeight,
+            maxWidth: '100%',
+            // Width derived from height when height is the binding constraint.
+            width: `min(100%, ${maxHeight * aspect}px)`,
+            position: 'relative',
+            cursor: 'zoom-in',
+          }}
+        >
+          <JaePhoto photo={photo} size="medium" sizes={sizes} priority={priority} />
+        </div>
       </div>
     );
   }
@@ -171,46 +219,50 @@ export default function ProjectDetail() {
         </div>
       </div>
 
-      <div style={{ padding: `0 ${pad}px 40px`, maxWidth: 1100 }}>
+      <div style={{ padding: `0 ${pad}px 40px`, maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 16 : 24 }}>
           {layout.map((row, i) => {
             if (row.type === 'full') {
               const photo = photos[row.idx];
               if (!photo) return null;
               return (
-                <PhotoTile
-                  key={i}
-                  photo={photo}
-                  width="100%"
-                  height={isMobile ? 300 : 580}
-                  sizes={isMobile ? '100vw' : '1100px'}
-                  label={photo.alt}
-                  priority={i === 0}
-                />
+                <div key={i} style={{ display: 'flex', justifyContent: 'center' }}>
+                  <PhotoTile
+                    photo={photo}
+                    maxWidth="100%"
+                    maxHeight={isMobile ? 520 : 800}
+                    sizes={isMobile ? '100vw' : '1100px'}
+                    label={photo.alt}
+                    priority={i === 0}
+                  />
+                </div>
               );
             }
             if (row.type === 'wide') {
               const photo = photos[row.idx];
               if (!photo) return null;
               return (
-                <PhotoTile
-                  key={i}
-                  photo={photo}
-                  width="100%"
-                  height={isMobile ? 240 : 420}
-                  sizes={isMobile ? '100vw' : '1100px'}
-                  label={photo.alt}
-                />
+                <div key={i} style={{ display: 'flex', justifyContent: 'center' }}>
+                  <PhotoTile
+                    photo={photo}
+                    maxWidth="100%"
+                    maxHeight={isMobile ? 300 : 540}
+                    sizes={isMobile ? '100vw' : '1100px'}
+                    label={photo.alt}
+                  />
+                </div>
               );
             }
             if (row.type === 'pair') {
               const a = photos[row.idx1];
               const b = photos[row.idx2];
               if (!a || !b) return null;
+              const isPortraitPair = a.width / a.height < 0.85 && b.width / b.height < 0.85;
+              const pairMaxHeight = isPortraitPair ? 700 : 520;
               return (
-                <div key={i} style={{ display: 'flex', gap: 24 }}>
-                  <PhotoTile photo={a} width="50%" height={520} sizes="550px" label={a.alt} />
-                  <PhotoTile photo={b} width="50%" height={520} sizes="550px" label={b.alt} />
+                <div key={i} style={{ display: 'flex', gap: 24, justifyContent: 'center' }}>
+                  <PhotoTile photo={a} maxWidth="50%" maxHeight={pairMaxHeight} sizes="550px" label={a.alt} />
+                  <PhotoTile photo={b} maxWidth="50%" maxHeight={pairMaxHeight} sizes="550px" label={b.alt} />
                 </div>
               );
             }
@@ -219,10 +271,10 @@ export default function ProjectDetail() {
             const c = photos[row.idx3];
             if (!a || !b || !c) return null;
             return (
-              <div key={i} style={{ display: 'flex', gap: 24 }}>
-                <PhotoTile photo={a} width="33.3%" height={400} sizes="370px" label={a.alt} />
-                <PhotoTile photo={b} width="33.3%" height={400} sizes="370px" label={b.alt} />
-                <PhotoTile photo={c} width="33.3%" height={400} sizes="370px" label={c.alt} />
+              <div key={i} style={{ display: 'flex', gap: 24, justifyContent: 'center' }}>
+                <PhotoTile photo={a} maxWidth="33.3%" maxHeight={400} sizes="370px" label={a.alt} />
+                <PhotoTile photo={b} maxWidth="33.3%" maxHeight={400} sizes="370px" label={b.alt} />
+                <PhotoTile photo={c} maxWidth="33.3%" maxHeight={400} sizes="370px" label={c.alt} />
               </div>
             );
           })}

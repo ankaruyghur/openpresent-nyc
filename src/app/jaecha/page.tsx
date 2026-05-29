@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { activateOnKey } from './_components/a11y';
-import { getHomeGridPicks } from './_components/curation';
-import { PALETTE, PORTFOLIO_PROJECTS } from './_components/data';
+import { getHomeGrid } from './_components/curation';
+import { PALETTE } from './_components/data';
 import { JaePhoto } from './_components/JaePhoto';
 import type { JaePhoto as JaePhotoMeta } from './_components/photo-types';
 import { ZoomOverlay } from './_components/ZoomOverlay';
@@ -49,20 +49,14 @@ export default function JaechaHome() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  // Flatten all photos across projects, preserving the data.ts project order
-  // (Environmental → Events → BTS → Still Life → Landscape → Commercial).
-  const allPhotos = useMemo(() => {
-    return PORTFOLIO_PROJECTS.flatMap((p) => getHomeGridPicks(p.id));
-  }, []);
+  // Jae's curated home-grid sequence — order matches the source `Homepage/`
+  // folder (Homepage-1 first, etc). See HOME_GRID in curation.ts.
+  const allPhotos = useMemo(() => getHomeGrid(), []);
 
-  const tiles = useMemo<HomeTile[]>(() => {
-    if (allPhotos.length === 0) return [];
-    const n = isMobile ? 15 : 25;
-    return Array.from({ length: n }, (_, i) => ({
-      ...allPhotos[i % allPhotos.length],
-      uid: `${allPhotos[i % allPhotos.length].id}-${i}`,
-    }));
-  }, [allPhotos, isMobile]);
+  const tiles = useMemo<HomeTile[]>(
+    () => allPhotos.map((p, i) => ({ ...p, uid: `${p.id}-${i}` })),
+    [allPhotos],
+  );
 
   const placements = isMobile ? MOBILE_PLACEMENTS : DESKTOP_PLACEMENTS;
   const widths = isMobile ? MOBILE_WIDTHS : DESKTOP_WIDTHS;
@@ -119,7 +113,7 @@ export default function JaechaHome() {
                     photo={t}
                     size="medium"
                     sizes={isMobile ? '85vw' : '40vw'}
-                    priority={i < 2}
+                    priority={i < 15}
                   />
                 </div>
               </div>

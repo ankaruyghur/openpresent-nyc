@@ -46,13 +46,17 @@ removing / reordering photos lives in [`docs/JAECHA_PHOTOS.md`](docs/JAECHA_PHOT
 
 The form at `/jaecha/contact` is visual-only — `onSubmit` just calls `preventDefault()`.
 
-- [ ] Decide submission target:
-  - **mailto:** simplest; opens user's mail client. No backend.
-  - **Existing photobooth pattern**: add a `/api/jaecha/contact` route that ships to email
-    via Resend / SES / Postmark. Adds spam protection + form validation.
-  - **Third-party form service**: Formspree / Basin — zero code.
-- [ ] Add honeypot or hCaptcha if we go API/third-party.
-- [ ] Confirmation UI (success / error states) inside the existing form.
+Plan: wire BOTH paths so the user can choose at click-time.
+
+- [ ] **Primary "Send" button → Formspree** (or Basin). Hosted endpoint, POSTs the
+      form fields, routes to Jae's email. Free tier is fine for portfolio volume.
+      Add a honeypot field to the form and rely on the service's built-in spam
+      filtering.
+- [ ] **Secondary "Email directly" link → `mailto:`** with prefilled subject. Opens
+      the user's mail app — useful on desktop or for users who don't want to fill
+      a web form.
+- [ ] Confirmation UI (success / error / sending states) inside the form for the
+      Formspree path.
 
 ## 3. Domain redirect — jaebinchae.com → openpresent.nyc/jaecha
 

@@ -65,7 +65,7 @@ export const PROJECTS: Project[] = [
     sub: 'Events',
     year: '2024',
     accent: '#5E6B7B',
-    sourceFolder: 'Portrait/Events/Jungle Jungle 2024',
+    sourceFolder: 'Portrait/Events/1- Jungle Jungle',
   },
   {
     id: 'evt-open-soul-vol-iii-2025',
@@ -74,7 +74,7 @@ export const PROJECTS: Project[] = [
     sub: 'Events',
     year: '2025',
     accent: '#7B6E5E',
-    sourceFolder: 'Portrait/Events/Open Soul Vol III 2025',
+    sourceFolder: 'Portrait/Events/3- Open Soul Vol III',
   },
   {
     id: 'evt-pinky-promise-2026',
@@ -83,7 +83,7 @@ export const PROJECTS: Project[] = [
     sub: 'Events',
     year: '2026',
     accent: '#6B5E7B',
-    sourceFolder: 'Portrait/Events/Pinky Promise 2026',
+    sourceFolder: 'Portrait/Events/2-Pinky Promise',
   },
 
   // Portraits — Behind the Scenes
@@ -94,7 +94,7 @@ export const PROJECTS: Project[] = [
     sub: 'Behind the Scenes',
     year: '2023',
     accent: '#6E5E7B',
-    sourceFolder: 'Portrait/Behind the Scene/A Preserving Sweet 2023',
+    sourceFolder: 'Portrait/Behind the Scene/1-A Preserving Sweet 2023',
   },
   {
     id: 'bts-america-fever-lancaster',
@@ -103,7 +103,7 @@ export const PROJECTS: Project[] = [
     sub: 'Behind the Scenes',
     year: '2024',
     accent: '#5E7B6E',
-    sourceFolder: 'Portrait/Behind the Scene/America Fever - Lancaster',
+    sourceFolder: 'Portrait/Behind the Scene/3- America Fever - Lancaster',
   },
   {
     id: 'bts-america-fever-malibu',
@@ -112,7 +112,7 @@ export const PROJECTS: Project[] = [
     sub: 'Behind the Scenes',
     year: '2024',
     accent: '#7B7B6E',
-    sourceFolder: 'Portrait/Behind the Scene/America Fever - Malibu',
+    sourceFolder: 'Portrait/Behind the Scene/4- America Fever - Malibu',
   },
   {
     id: 'bts-america-fever-salton-sea',
@@ -121,7 +121,7 @@ export const PROJECTS: Project[] = [
     sub: 'Behind the Scenes',
     year: '2024',
     accent: '#6E7B5E',
-    sourceFolder: 'Portrait/Behind the Scene/America Fever - Salton Sea',
+    sourceFolder: 'Portrait/Behind the Scene/2- America Fever - Salton Sea',
   },
   {
     id: 'bts-america-fever-tujunga-dam',
@@ -130,7 +130,7 @@ export const PROJECTS: Project[] = [
     sub: 'Behind the Scenes',
     year: '2024',
     accent: '#5E6B6E',
-    sourceFolder: 'Portrait/Behind the Scene/America Fever - Tujunga Dam',
+    sourceFolder: 'Portrait/Behind the Scene/5- America Fever - Tujunga Dam',
   },
   {
     id: 'bts-kelsey-kuan-roller-coaster-mv',
@@ -139,7 +139,7 @@ export const PROJECTS: Project[] = [
     sub: 'Behind the Scenes',
     year: '2024',
     accent: '#6B6E7B',
-    sourceFolder: 'Portrait/Behind the Scene/Kelsey Kuan - Roller Coaster MV',
+    sourceFolder: 'Portrait/Behind the Scene/6- Kelsey Kuan - Roller Coaster MV',
   },
 
   // Still Life (flat)
@@ -172,7 +172,7 @@ export const PROJECTS: Project[] = [
     sub: null,
     year: '2021',
     accent: '#7B6B5E',
-    sourceFolder: 'Commercial/By Way Of 2021 Lily',
+    sourceFolder: 'Commercial/1- By Way Of 2021 Lily',
   },
   {
     id: 'cm-by-way-of-2024-hypnotic-glasses',
@@ -181,7 +181,7 @@ export const PROJECTS: Project[] = [
     sub: null,
     year: '2024',
     accent: '#6B6E5E',
-    sourceFolder: 'Commercial/By Way of 2024 Hypnotic Glasses',
+    sourceFolder: 'Commercial/2- By Way of 2024 Hypnotic Glasses',
   },
 
   // Bio / self-portrait used on the contact page. Excluded from portfolio

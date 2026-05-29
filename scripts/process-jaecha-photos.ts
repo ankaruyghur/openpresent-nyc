@@ -73,8 +73,8 @@ const BLUR_QUALITY = 40;
 /** Max parallel sharp pipelines. sharp is multithreaded internally, so keep low. */
 const CONCURRENCY = 3;
 
-/** Source filename extensions to process. .tif skipped (confirmed duplicates). */
-const SOURCE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.heic']);
+/** Source filename extensions to process. Sharp handles all of these natively. */
+const SOURCE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.heic', '.tif', '.tiff']);
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const PHOTOS_OUT = path.join(
@@ -99,6 +99,7 @@ type Args = {
   dryRun: boolean;
   prune: boolean;
   yes: boolean;
+  force: boolean;
 };
 
 function parseArgs(): Args {
@@ -108,6 +109,7 @@ function parseArgs(): Args {
   let dryRun = false;
   let prune = false;
   let yes = false;
+  let force = false;
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === '--source' || a === '-s') source = args[++i];
@@ -115,6 +117,7 @@ function parseArgs(): Args {
     else if (a === '--dry-run') dryRun = true;
     else if (a === '--prune') prune = true;
     else if (a === '--yes' || a === '-y') yes = true;
+    else if (a === '--force') force = true;
     else if (a === '--help' || a === '-h') {
       console.log(`Usage: npm run jaecha:upload -- --source "/path/to/Portfolio 2026" [options]
 
@@ -128,6 +131,11 @@ Options:
   --prune          Detect photos in S3 / photos.ts that no longer exist in the
                    source folder and delete their variants. Off by default —
                    removals are explicit.
+  --force          Re-upload every variant even if S3 already has it. Use after
+                   the source files at existing slugs have been replaced with
+                   different content (e.g. Jae renumbered his portfolio).
+                   Doesn't bypass --prune; combine the flags if you also want
+                   orphans deleted.
   --yes, -y        Skip the interactive confirmation prompt.
   --help, -h       Show this help.`);
       process.exit(0);
@@ -137,7 +145,7 @@ Options:
     console.error('error: --source is required.\n  hint: --source "/Volumes/.../Portfolio 2026"');
     process.exit(2);
   }
-  return { source, project, dryRun, prune, yes };
+  return { source, project, dryRun, prune, yes, force };
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -261,6 +269,7 @@ async function processOnePhoto(
   filename: string,
   fullPath: string,
   dryRun: boolean,
+  force: boolean,
 ): Promise<ProcessedPhoto> {
   const slug = slugify(filename);
   const buf = await fs.readFile(fullPath);
@@ -283,7 +292,7 @@ async function processOnePhoto(
   for (const size of sizes) {
     for (const format of FORMATS) {
       const key = `${s3KeyBase}-${size}.${format}`;
-      const exists = dryRun ? false : await s3Exists(key);
+      const exists = dryRun || force ? false : await s3Exists(key);
       if (exists) {
         skipped++;
         continue;
@@ -429,6 +438,7 @@ async function main() {
   console.log(`projects: ${args.project ?? 'all'}`);
   console.log(`mode:     ${args.dryRun ? 'DRY RUN (no S3 writes, no photos.ts emit)' : 'LIVE'}`);
   console.log(`prune:    ${args.prune ? 'YES — orphan photos will be deleted' : 'no'}`);
+  console.log(`force:    ${args.force ? 'YES — every variant will be re-uploaded' : 'no'}`);
   console.log('');
 
   const projects = args.project
@@ -485,7 +495,7 @@ async function main() {
     console.log(`[${project.id}] ${files.length} photos in ${project.sourceFolder}`);
 
     const results = await mapLimit(files, CONCURRENCY, async ({ filename, fullPath }) => {
-      const result = await processOnePhoto(project, filename, fullPath, args.dryRun);
+      const result = await processOnePhoto(project, filename, fullPath, args.dryRun, args.force);
       console.log(
         `  ${project.id}/${slugify(filename)}  ↑${result.uploaded} ⤳${result.skipped}  ${fmtBytes(result.bytes)}  ← ${filename}`,
       );

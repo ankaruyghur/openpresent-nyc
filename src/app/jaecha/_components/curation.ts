@@ -44,6 +44,45 @@ export const CURATION: Record<string, Curation> = {
 };
 
 /**
+ * Cross-project home-grid sequence. Order matches Jae's `Homepage/` folder
+ * (Homepage-1.jpg → first tile, Homepage-2.jpg → second, …). IDs unknown to
+ * PHOTOS are silently dropped, so this list survives renames if you re-run
+ * the upload script.
+ */
+export const HOME_GRID: string[] = [
+  'bts-a-preserving-sweet-2023/bts-aps-1',         // Homepage-1
+  'env/portrait-env-1',                            // Homepage-2
+  'evt-jungle-jungle-2024/events-opjj-1',          // Homepage-3
+  'env/portrait-env-2',                            // Homepage-4
+  'env/portrait-env-3',                            // Homepage-5
+  'bts-america-fever-malibu/bts-afm-2',            // Homepage-6
+  'bts-america-fever-lancaster/bts-afl-1',         // Homepage-7
+  'bts-america-fever-lancaster/bts-afl-8',         // Homepage-8
+  'bts-america-fever-lancaster/bts-afl-16',        // Homepage-9
+  'env/portrait-env-4',                            // Homepage-10
+  'env/portrait-env-6',                            // Homepage-11
+  'env/portrait-env-5',                            // Homepage-12
+  'env/portrait-env-8',                            // Homepage-13
+  'evt-jungle-jungle-2024/events-opjj-4',          // Homepage-14
+  'evt-jungle-jungle-2024/events-opjj-7',          // Homepage-15
+  'evt-jungle-jungle-2024/events-opjj-3',          // Homepage-16
+  'evt-open-soul-vol-iii-2025/events-osviii-1',    // Homepage-17
+  'bts-kelsey-kuan-roller-coaster-mv/bts-kkrcmv-1', // Homepage-18
+  'env/portrait-env-9',                            // Homepage-19
+  'env/portrait-env-10',                           // Homepage-20
+  'env/portrait-env-11',                           // Homepage-21
+  'evt-pinky-promise-2026/events-oppp-3',          // Homepage-22
+  'env/portrait-env-21',                           // Homepage-23
+  'env/portrait-env-22',                           // Homepage-24
+  'cm-by-way-of-2021-lily/commercial-bwol-1',      // Homepage-25
+  'evt-pinky-promise-2026/events-oppp-2',          // Homepage-26
+  'env/portrait-env-20',                           // Homepage-27
+  'env/portrait-env-19',                           // Homepage-28
+  'env/portrait-env-13',                           // Homepage-29
+  'env/portrait-env-14',                           // Homepage-30
+];
+
+/**
  * Resolve the display order of photos for a project, applying curation.
  *
  * 1. Start with photos uploaded to S3 (from PHOTOS[projectId]).
@@ -102,4 +141,21 @@ export function getHomeGridPicks(projectId: string): JaePhoto[] {
   if (!c.homeGridPicks || c.homeGridPicks.length === 0) return photos;
   const pickSet = new Set(c.homeGridPicks);
   return photos.filter((p) => pickSet.has(p.id));
+}
+
+/**
+ * Resolve HOME_GRID (cross-project sequence) into a list of photos in
+ * Jae's intended order. IDs that no longer exist in PHOTOS are dropped.
+ */
+export function getHomeGrid(): JaePhoto[] {
+  const byId = new Map<string, JaePhoto>();
+  for (const list of Object.values(PHOTOS)) {
+    for (const p of list) byId.set(p.id, p);
+  }
+  const out: JaePhoto[] = [];
+  for (const id of HOME_GRID) {
+    const p = byId.get(id);
+    if (p) out.push(p);
+  }
+  return out;
 }
