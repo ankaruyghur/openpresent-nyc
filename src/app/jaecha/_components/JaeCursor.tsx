@@ -90,6 +90,11 @@ export function JaeCursor() {
 
     const root = document.documentElement;
     root.classList.add('jae-cursor-active');
+    // Belt-and-suspenders: also force `cursor: none` inline on <html>/<body>.
+    // Inline !important is the highest-specificity, race-free way to hide the OS
+    // cursor — it can't be lost to a competing rule or a stylesheet timing gap.
+    root.style.setProperty('cursor', 'none', 'important');
+    document.body.style.setProperty('cursor', 'none', 'important');
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -182,6 +187,8 @@ export function JaeCursor() {
       document.removeEventListener('pointerleave', onLeave);
       document.removeEventListener('pointerenter', onEnter);
       root.classList.remove('jae-cursor-active');
+      root.style.removeProperty('cursor');
+      document.body.style.removeProperty('cursor');
     };
   }, [enabled]);
 
