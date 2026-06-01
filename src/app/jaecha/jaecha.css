@@ -7,3 +7,38 @@
 .jae-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* ---- Custom animated cursor (see _components/JaeCursor.tsx) ---- */
+
+/* When the JS follower is mounted, hide the OS cursor everywhere in /jaecha.
+   Zoomable tiles are detected from their inline `style="cursor:zoom-in"`
+   attribute (not the computed value), so this global override is safe — it
+   doesn't blind the follower's hit-test. */
+html.jae-cursor-active,
+html.jae-cursor-active * {
+  cursor: none !important;
+}
+
+/* Frame animation = step background-position-x across the strip. The end
+   position is -(cellW * frames) so steps(N) lands one cell per frame. Values
+   match the SPRITES manifest in JaeCursor.tsx. */
+@keyframes jae-cursor-idle {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -132px; /* 33 * 4 */
+  }
+}
+
+@keyframes jae-cursor-hover {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -294px; /* 42 * 7 */
+  }
+}
+
+/* Note: the click state has no keyframes — it's the default hand frozen on a
+   single frame (see `freezeFrame` in JaeCursor.tsx), not an animation. */
