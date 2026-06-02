@@ -56,7 +56,7 @@ export const jaechaCursorTheme: CursorTheme = {
     lifetime: 1500,
     firstFrameHold: 2,
     gravity: 250,
-    emitInterval: 55,
+    emitInterval: 42,
     burst: 8,
     max: 60,
   },
