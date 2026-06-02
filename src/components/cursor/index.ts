@@ -1,2 +1,7 @@
 export { CursorProvider } from './CursorProvider';
-export type { CursorTheme, CursorStateConfig, CursorProviderProps } from './types';
+export type {
+  CursorTheme,
+  CursorStateConfig,
+  CursorTrailConfig,
+  CursorProviderProps,
+} from './types';

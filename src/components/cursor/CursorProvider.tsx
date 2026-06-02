@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import './cursor.css';
+import { createTrail } from './trail';
 import type { CursorProviderProps, CursorStateConfig, CursorTheme } from './types';
 
 /**
@@ -109,7 +110,12 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
     if (!fine) return;
 
     let cancelled = false;
-    const urls = Array.from(new Set(Object.values(theme.states).map((s) => s.src)));
+    const urls = Array.from(
+      new Set([
+        ...Object.values(theme.states).map((s) => s.src),
+        ...(theme.trail ? [theme.trail.src] : []),
+      ]),
+    );
     Promise.all(
       urls.map(
         (src) =>
@@ -136,6 +142,12 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
     acquireHide();
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Optional falling-sparkle trail. Skipped entirely under reduced motion. Its
+    // rAF loop only runs while particles are alive, so an idle cursor costs nothing.
+    const trail = theme.trail && !reduceMotion ? createTrail(theme.trail) : null;
+    const emitInterval = theme.trail?.emitInterval ?? 55;
+    let lastEmit = 0;
 
     const getState = (name: string): CursorStateConfig =>
       theme.states[name] ?? theme.states.idle;
@@ -198,6 +210,16 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
       }
       place();
       ensureHidden();
+
+      // Emit a trail particle, throttled by emitInterval so density is
+      // frame-rate independent (fast flicks spawn more within the cap).
+      if (trail) {
+        const t = performance.now();
+        if (t - lastEmit >= emitInterval) {
+          lastEmit = t;
+          trail.emit(e.clientX, e.clientY);
+        }
+      }
     };
 
     const syncState = () => {
@@ -211,6 +233,7 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
     const onDown = () => {
       down.current = true;
       syncState();
+      if (trail) trail.burst(pos.current.x, pos.current.y);
     };
     const onUp = () => {
       down.current = false;
@@ -248,6 +271,7 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
       document.removeEventListener('pointerenter', onEnter);
       window.removeEventListener('focus', ensureHidden);
       document.removeEventListener('visibilitychange', ensureHidden);
+      trail?.destroy();
       releaseHide();
     };
   }, [enabled, theme, scale, pressState]);
