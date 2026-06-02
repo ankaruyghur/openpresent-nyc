@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { JaeCursor } from './_components/JaeCursor';
+import { CursorProvider } from '@/components/cursor';
+import { jaechaCursorTheme } from '@/components/cursor/themes/jaecha';
 import { NavBar } from './_components/NavBar';
 import { dmMono, libreBaskerville, montserrat } from './fonts';
 import './jaecha.css';
@@ -28,7 +29,7 @@ export default function JaechaLayout({ children }: { children: React.ReactNode }
     >
       <NavBar />
       {children}
-      <JaeCursor />
+      <CursorProvider theme={jaechaCursorTheme} />
     </div>
   );
 }

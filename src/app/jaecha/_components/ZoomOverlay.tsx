@@ -46,6 +46,17 @@ export function ZoomOverlay({ photo, onClose }: Props) {
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  // Lock background scrolling while a photo is expanded — site-wide, since this
+  // overlay is the single expand mechanism across every jaecha page. A class on
+  // <html> drives the CSS lock (see jaecha.css), which freezes both document
+  // scroll (taller sub-pages) and the inner `.jae-scroll` container (home grid).
+  // A class — not imperative inline styles — so React re-renders can't clobber
+  // the lock on the `.jae-scroll` element it owns.
+  useEffect(() => {
+    document.documentElement.classList.add('jae-scroll-locked');
+    return () => document.documentElement.classList.remove('jae-scroll-locked');
+  }, []);
+
   return (
     <div
       onClick={onClose}

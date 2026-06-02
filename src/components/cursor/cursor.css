@@ -1,0 +1,27 @@
+/* Custom cursor engine — see src/components/cursor/CursorProvider.tsx.
+ *
+ * Single source of truth for hiding the OS cursor. The provider toggles the
+ * `op-cursor-hidden` class on <html>; the universal `!important` rule below
+ * beats any element's own cursor (inline `cursor: pointer` / `zoom-in` / a
+ * modal's `zoom-out`, etc.) without those elements needing to know about it.
+ *
+ * This rule is permanent (shipped in the bundle, never injected/removed at
+ * runtime); only the class toggles. The provider re-asserts the class on pointer
+ * events and on a low-rate interval, so the OS can't leave the native cursor
+ * showing after it transiently re-resolves it (modal close while stationary,
+ * focus change, notification). */
+html.op-cursor-hidden,
+html.op-cursor-hidden * {
+  cursor: none !important;
+}
+
+/* Chromium quirk: `cursor: none` is ignored when the OS resolves the cursor
+   directly from an <img> — the native arrow shows over images even though their
+   computed cursor is `none`. Making images pointer-transparent forces the OS to
+   resolve the cursor from their wrapper (a non-image element, which honors
+   `cursor: none`). Safe because click & hover targets are always the wrapper
+   elements — the engine's `data-cursor` hit-test and gallery onClicks live on
+   wrappers, never on the <img>. */
+html.op-cursor-hidden img {
+  pointer-events: none;
+}
