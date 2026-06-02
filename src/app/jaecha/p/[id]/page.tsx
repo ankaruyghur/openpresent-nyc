@@ -157,6 +157,7 @@ export default function ProjectDetail() {
         <div
           role="button"
           tabIndex={0}
+          data-cursor="hover"
           aria-label={`Zoom into ${label}`}
           onClick={() => setZoomed(photo)}
           onKeyDown={activateOnKey(() => setZoomed(photo))}

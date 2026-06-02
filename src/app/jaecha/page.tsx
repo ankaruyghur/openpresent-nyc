@@ -87,6 +87,7 @@ export default function JaechaHome() {
                 <div
                   role="button"
                   tabIndex={0}
+                  data-cursor="hover"
                   aria-label={`Zoom into ${t.alt}`}
                   onClick={() => setZoomed(t.uid)}
                   onKeyDown={activateOnKey(() => setZoomed(t.uid))}

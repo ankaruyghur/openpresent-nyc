@@ -126,6 +126,7 @@ export function PortraitRow({ label, items, viewAllHref }: Props) {
                 key={item.photo.id}
                 role="button"
                 tabIndex={0}
+                data-cursor="hover"
                 aria-label={`Zoom into ${item.photo.alt}`}
                 onClick={() => setZoomed(i)}
                 onKeyDown={activateOnKey(() => setZoomed(i))}

@@ -68,6 +68,7 @@ export function ScatteredGallery({ title, photos, featuredIndex = null }: Props)
               key={photo.id}
               role="button"
               tabIndex={0}
+              data-cursor="hover"
               aria-label={`Zoom into ${photo.alt}`}
               onClick={() => setZoomed(photo)}
               onKeyDown={activateOnKey(() => setZoomed(photo))}

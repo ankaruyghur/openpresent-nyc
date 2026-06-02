@@ -95,6 +95,7 @@ export default function SubSectionGallery() {
                 key={photo.id}
                 role="button"
                 tabIndex={0}
+                data-cursor="hover"
                 aria-label={`Zoom into ${photo.alt}`}
                 onClick={() => setZoomed(photo)}
                 onKeyDown={activateOnKey(() => setZoomed(photo))}
