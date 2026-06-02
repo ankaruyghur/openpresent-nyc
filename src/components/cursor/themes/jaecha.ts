@@ -46,4 +46,18 @@ export const jaechaCursorTheme: CursorTheme = {
       freezeFrame: 2,
     },
   },
+  // Falling-sparkle trail (8-frame lifecycle strip, 40px cells). Tuned for a
+  // "medium" amount: a noticeable trail while moving + a satisfying click burst.
+  trail: {
+    src: '/jaecha/cursors/sparkles.png?v=1',
+    frames: 8,
+    cell: 40,
+    scale: 1.5,
+    lifetime: 1500,
+    firstFrameHold: 2,
+    gravity: 250,
+    emitInterval: 55,
+    burst: 8,
+    max: 60,
+  },
 };

@@ -48,6 +48,40 @@ export type CursorTheme = {
     string,
     CursorStateConfig
   >;
+  /** Optional falling-sparkle trail emitted from the cursor. */
+  trail?: CursorTrailConfig;
+};
+
+/**
+ * A particle trail: spawns sprite particles from the cursor that fall, advance
+ * through the strip's frames (aging), and fade out. Emitted while the pointer
+ * moves and as a burst on click.
+ */
+export type CursorTrailConfig = {
+  /** Sprite strip URL — frames played in order as the particle ages. */
+  src: string;
+  /** Frame count in the strip. */
+  frames: number;
+  /** Source-pixel cell size (assumed square cells laid out horizontally). */
+  cell: number;
+  /** On-screen scale of each particle. Default 1. */
+  scale?: number;
+  /** Particle lifetime in ms (fall + frame cycle + fade happen over this). Default 900. */
+  lifetime?: number;
+  /**
+   * Hold the first frame for this multiple of a normal frame's duration. >1
+   * lengthens the TOTAL life (frames 1..N keep their normal duration) so a fresh
+   * sparkle lingers near the cursor before aging. Default 1 (no extra hold).
+   */
+  firstFrameHold?: number;
+  /** Downward acceleration in px/s². Default 900. */
+  gravity?: number;
+  /** Avg ms between trail emissions while moving. Lower = denser. Default 55. */
+  emitInterval?: number;
+  /** Particles spawned per click burst. Default 8. */
+  burst?: number;
+  /** Hard cap on simultaneous live particles (perf guard). Default 60. */
+  max?: number;
 };
 
 export type CursorProviderProps = {
