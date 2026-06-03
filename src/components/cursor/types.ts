@@ -44,12 +44,23 @@ export type CursorTheme = {
   scale?: number;
   /** State shown while the mouse is held down. Default 'click'. */
   pressState?: string;
-  states: { idle: CursorStateConfig; click: CursorStateConfig } & Record<
-    string,
-    CursorStateConfig
-  >;
+  /** `idle` is required; `click` and any other key are optional hover/press variants. */
+  states: { idle: CursorStateConfig } & Record<string, CursorStateConfig>;
   /** Optional falling-sparkle trail emitted from the cursor. */
   trail?: CursorTrailConfig;
+  /**
+   * Optional click feedback that replays the IDLE animation fast and decelerates
+   * back to normal speed (ease-out), instead of switching to a `click` sprite.
+   * On pointerdown the idle strip loops `spins` times over `durationMs` with an
+   * ease-out curve, then hands back to the steady idle loop.
+   */
+  clickSpin?: {
+    spins?: number;
+    /** Total time budget for the spin (ms). Default 1000. */
+    durationMs?: number;
+    /** Hold the fast spin at constant speed until this time (ms), then ease to idle. Default 800. */
+    holdMs?: number;
+  };
 };
 
 /**

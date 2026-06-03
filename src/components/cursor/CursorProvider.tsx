@@ -68,13 +68,88 @@ function keyframesName(themeId: string, state: string) {
   return `op-cursor-${themeId}-${state}`;
 }
 
+/** Keyframes name for the one-shot click spin-up. */
+function clickSpinName(themeId: string) {
+  return `op-cursor-${themeId}-clickspin`;
+}
+
+/**
+ * Build the click spin-up keyframe on a REAL time budget (not normalized), so the
+ * spin genuinely decelerates to the idle frame rate by the end.
+ *
+ * Per-frame intervals ease from a fast burst up to exactly the idle frame time
+ * (1/idle.fps). We accumulate frames until ~durationMs is filled, then trim to a
+ * whole number of strip cycles so the spin ends on frame 0 (where idle begins) —
+ * giving a seamless, on-beat handoff at true idle speed. Returns the CSS and the
+ * actual duration (seconds) to run it for.
+ */
+function buildClickSpin(theme: CursorTheme): { css: string; durationSec: number } {
+  const idle = theme.states.idle;
+  const idleMs = 1000 / idle.fps; // idle frame time — the deceleration target
+  const budgetMs = theme.clickSpin?.durationMs ?? 1000;
+  const fastMs = idleMs * 0.32; // initial burst (~3× idle speed)
+  // Hold the fast spin at constant speed until holdMs, THEN ease fast → idle over
+  // the remaining budget. So it stays full-speed, then visibly winds down at the end.
+  const holdMs = theme.clickSpin?.holdMs ?? 800;
+
+  // Phase 1: flat-fast plateau until holdMs. Phase 2: ease fast → idle over the
+  // remaining budget window, and KEEP easing until we actually reach idle speed
+  // (so the spin always finishes fully decelerated, never cut off mid-slowdown).
+  const slowdownMs = Math.max(1, budgetMs - holdMs);
+  const intervals: number[] = [];
+  let elapsed = 0;
+  let slow = 0; // time spent in the slowdown phase
+  while (true) {
+    if (elapsed < holdMs) {
+      intervals.push(fastMs); // flat-fast plateau
+      elapsed += fastMs;
+      continue;
+    }
+    const p = slow / slowdownMs;
+    const e = 1 - Math.pow(1 - Math.min(1, p), 2); // ease-out
+    const iv = fastMs + (idleMs - fastMs) * e;
+    intervals.push(iv);
+    elapsed += iv;
+    slow += iv;
+    if (iv >= idleMs - 0.5) break; // fully decelerated to idle — stop
+  }
+  // Round UP to a whole number of strip cycles so it ends on frame 0, padding any
+  // extra frames at idle speed (never chop the deceleration we just built).
+  const rem = intervals.length % idle.frames;
+  if (rem !== 0) {
+    for (let i = 0; i < idle.frames - rem; i++) intervals.push(idleMs);
+  }
+  const used = intervals;
+  const total = used.reduce((a, b) => a + b, 0);
+
+  const stops = [`  0% { background-position-x: 0; animation-timing-function: step-end; }`];
+  let acc = 0;
+  for (let k = 1; k <= used.length; k++) {
+    acc += used[k - 1];
+    const pct = ((acc / total) * 100).toFixed(3);
+    const posCell = k % idle.frames; // wrap within the strip (ends at 0)
+    stops.push(
+      `  ${pct}% { background-position-x: ${-posCell * idle.cellW}px; animation-timing-function: step-end; }`,
+    );
+  }
+  return {
+    css: `@keyframes ${clickSpinName(theme.id)} {\n${stops.join('\n')}\n}`,
+    durationSec: total / 1000,
+  };
+}
+
 /**
  * Build the <style> text for all animated states in a theme. Each state steps
  * background-position-x across its strip, looping back to frame 0 (sawtooth).
  * Frozen / single-frame states are driven via inline style, not keyframes.
+ *
+ * If the theme has `clickSpin`, also emit a one-shot keyframe that replays the
+ * IDLE strip `spins` times but DECELERATING (ease-out): the frame advances are
+ * baked into eased percentage stops so it starts fast and settles to ~idle
+ * speed, then the engine hands back to the steady idle loop.
  */
 function buildKeyframes(theme: CursorTheme): string {
-  return Object.entries(theme.states)
+  const parts = Object.entries(theme.states)
     .filter(([, s]) => s.freezeFrame === undefined && s.frames > 1)
     .map(([state, s]) => {
       const end = -s.cellW * s.frames;
@@ -82,8 +157,14 @@ function buildKeyframes(theme: CursorTheme): string {
   from { background-position-x: 0; }
   to { background-position-x: ${end}px; }
 }`;
-    })
-    .join('\n');
+    });
+
+  if (theme.clickSpin) {
+    const { css } = buildClickSpin(theme);
+    parts.push(css);
+  }
+
+  return parts.join('\n');
 }
 
 export function CursorProvider({ theme, disabled = false }: CursorProviderProps) {
@@ -153,8 +234,30 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
       theme.states[name] ?? theme.states.idle;
 
     const computeState = (): string => {
-      if (down.current) return theme.states[pressState] ? pressState : 'idle';
+      // With clickSpin, the press feedback is the spin-up animation (handled
+      // separately), not a state switch — so don't change state on down.
+      if (down.current && !theme.clickSpin) return theme.states[pressState] ? pressState : 'idle';
       return hoverVariant.current ?? 'idle';
+    };
+
+    // Real spin duration (matches the time-based keyframe schedule, so the
+    // animation runs at the cadence it was built for and ends at idle speed).
+    const clickSpinDur = theme.clickSpin ? buildClickSpin(theme).durationSec : 0;
+
+    // One-shot click spin-up: play the decelerating keyframe once, then revert to
+    // whatever state we should be in (idle/hover). Guarded so rapid clicks restart.
+    const playClickSpin = () => {
+      const el = spriteRef.current;
+      if (!el || !theme.clickSpin || reduceMotion) return;
+      // Restart cleanly if a spin is already running.
+      el.style.animation = 'none';
+      void el.offsetWidth; // reflow so the re-assigned animation restarts
+      el.style.animation = `${clickSpinName(theme.id)} ${clickSpinDur}s linear 1`;
+      const onEnd = () => {
+        el.removeEventListener('animationend', onEnd);
+        applyState(state.current); // back to the steady idle/hover loop
+      };
+      el.addEventListener('animationend', onEnd);
     };
 
     const applyState = (next: string) => {
@@ -232,7 +335,8 @@ export function CursorProvider({ theme, disabled = false }: CursorProviderProps)
     };
     const onDown = () => {
       down.current = true;
-      syncState();
+      if (theme.clickSpin) playClickSpin();
+      else syncState();
       if (trail) trail.burst(pos.current.x, pos.current.y);
     };
     const onUp = () => {
