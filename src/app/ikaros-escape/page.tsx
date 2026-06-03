@@ -6,6 +6,7 @@ import styles from './epk.module.css';
 import { Noise } from "@/components/ui/shadcn-io/noise";
 import { Magnetic } from '@/components/ui/magnetic';
 import { SilkBackground } from '@/components/ui/shadcn-io/silk-background';
+import { CursorProvider, opCursorTheme } from '@/components/cursor';
 import {
     IconBrandInstagram,
     IconBrandSoundcloud,
@@ -302,6 +303,7 @@ export default function IkarosEscapeEPK() {
             className={`min-h-screen ${styles['epk-bg']} relative`}
             style={{ fontFamily: 'var(--font-geist-sans)' }}
         >
+            <CursorProvider theme={opCursorTheme} />
             {/* Film grain overlay */}
             <div className="fixed inset-0 pointer-events-none z-50 mix-blend-overlay">
                 <Noise

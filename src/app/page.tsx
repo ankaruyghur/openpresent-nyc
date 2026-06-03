@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { CursorProvider, opCursorTheme } from '@/components/cursor';
 
 export default function Home() {
   const [password, setPassword] = useState('');
@@ -93,6 +94,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center relative">
+      <CursorProvider theme={opCursorTheme} />
 
       <video
         ref={video1Ref}
