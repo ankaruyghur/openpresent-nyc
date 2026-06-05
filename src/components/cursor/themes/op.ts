@@ -14,7 +14,7 @@ import type { CursorTheme } from '../types';
  */
 export const opCursorTheme: CursorTheme = {
   id: 'op',
-  scale: 1.1,
+  scale: 0.9,
   states: {
     idle: {
       src: '/op/cursors/spin.png?v=1',
